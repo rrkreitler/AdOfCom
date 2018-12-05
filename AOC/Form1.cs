@@ -20,101 +20,50 @@ namespace AOC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int maxWidth = 0;
-            int maxHeight = 0;
-
             var data = textBox1.Text.Replace("\r\n","|").Split('|');
-            Claim[] claims = new Claim[data.Length];
+            Array.Sort(data);
+
             int index = 0;
-
-            foreach (var claim in data)
+            do
             {
-                claims[index] = new Claim(claim);
+                var tmp = data[index].Split(']');
+                var fields = tmp[1].Trim().Split(' ');
+                var id = Int32.Parse(fields[1].Substring(1));
 
-                if (maxWidth < claims[index].left + claims[index].width)
-                {
-                    maxWidth = claims[index].left + claims[index].width;
-                }
-                if (maxHeight < claims[index].height + claims[index].top)
-                {
-                    maxHeight = claims[index].height + claims[index].top;
-                }
-                index++;
-            }
+                fields = data[0].Split(' ');
+                var date = fields[0].Substring(1);
 
-            int[,] fabric = new int[maxWidth, maxHeight];
+                int asleep = -1;
 
-            foreach (var claim in claims)
-            {
-                for (int y = claim.top; y < claim.top + claim.height; y++)
+                do
                 {
-                    for (int x = claim.left; x < claim.left + claim.width; x++)
+                    index++;
+                    var timeData = data[index].Split(']');
+                    var times = data[0].Split(':');
+
+                    if (asleep == -1)
                     {
-                        if (fabric[x, y] != 2) fabric[x, y]++;
+                        asleep = Int32.Parse(times[1]);
                     }
-                }
-            }
-
-            int count = 0;
-
-            foreach (var i in fabric)
-            {
-                if (i == 2) count++;
-            }
-
-            foreach (var claim in claims)
-            {
-                bool found = true;
-
-                for (int y = claim.top; y < claim.top + claim.height & found; y++)
-                {
-                    for (int x = claim.left; x < claim.left + claim.width && found; x++)
+                    else
                     {
-                         found = fabric[x, y] == 1;
+                        cycles.Add(asleep, Int32.Parse(times[1]));
+                        asleep = -1;
                     }
-                }
+                } while (index < data.Length && !data[index+1].Contains("Guard"));
+            } while (index < data.Length);
 
-                if (found) textBox1.Text = claim.id.ToString();
-            }
+
+            
+
+            
 
 
             //textBox1.Text = count.ToString();
         }
 
-        private int CountDiffs(string s1, string s2)
-        {
-            int c = 0;
-            int count = 0;
-            do
-            {
-                if (s1.Substring(c, 1) != s2.Substring(c++, 1)) count++;
-            } while (c < s1.Length && count < 2);
-            return count;
-        }
+       
     }
 
-    public class Claim
-    {
-        public Claim(string claim)
-        {
-            var data = claim.Split(':');
-            var wh = data[1].Trim().Split('x');
-            width = Int32.Parse(wh[0].Trim());
-            height = Int32.Parse(wh[1].Trim());
-
-            var leftTop = data[0].Split('@');
-            id = Int32.Parse(leftTop[0].Trim().Substring(1));
-            var lt = leftTop[1].Trim().Split(',');
-            left = Int32.Parse(lt[0].Trim());
-            top = Int32.Parse(lt[1].Trim());
-            
-        }
-
-        public int id;
-        public int left;
-        public int top;
-
-        public int width;
-        public int height;
-    }
+    
 }
