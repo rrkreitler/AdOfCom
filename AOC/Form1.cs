@@ -62,7 +62,23 @@ namespace AOC
                 if (i == 2) count++;
             }
 
-            textBox1.Text = count.ToString();
+            foreach (var claim in claims)
+            {
+                bool found = true;
+
+                for (int y = claim.top; y < claim.top + claim.height & found; y++)
+                {
+                    for (int x = claim.left; x < claim.left + claim.width && found; x++)
+                    {
+                         found = fabric[x, y] == 1;
+                    }
+                }
+
+                if (found) textBox1.Text = claim.id.ToString();
+            }
+
+
+            //textBox1.Text = count.ToString();
         }
 
         private int CountDiffs(string s1, string s2)
@@ -87,11 +103,14 @@ namespace AOC
             height = Int32.Parse(wh[1].Trim());
 
             var leftTop = data[0].Split('@');
+            id = Int32.Parse(leftTop[0].Trim().Substring(1));
             var lt = leftTop[1].Trim().Split(',');
             left = Int32.Parse(lt[0].Trim());
             top = Int32.Parse(lt[1].Trim());
             
         }
+
+        public int id;
         public int left;
         public int top;
 
