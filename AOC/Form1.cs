@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,28 +20,49 @@ namespace AOC
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var data = textBox1.Text.Replace("\r\n",",").Split(',');
-            Array.Sort(data);
-            //var data = textBox1.Text.Split(',');
-            textBox1.Text = "";
-            for (int i = 0; i < data.Length-1; i++)
+            int maxWidth = 0;
+            int maxHeight = 0;
+
+            var data = textBox1.Text.Replace("\r\n","|").Split('|');
+            Claim[] claims = new Claim[data.Length];
+            int index = 0;
+
+            foreach (var claim in data)
             {
-                for (int x = i + 1; x < data.Length; x++)
+                claims[index] = new Claim(claim);
+
+                if (maxWidth < claims[index].left + claims[index].width)
                 {
-                    if (CountDiffs(data[i], data[x]) == 1)
-                    {
-                        for (int c = 0; c < data[i].Length; c++)
-                        {
-                            if (data[i].Substring(c,1) == data[x].Substring(c,1)) textBox1.AppendText(data[i].Substring(c,1));
-                        }
-                        break;
-                    }
+                    maxWidth = claims[index].left + claims[index].width;
                 }
-                if (textBox1.Text != "") break;
+                if (maxHeight < claims[index].height + claims[index].top)
+                {
+                    maxHeight = claims[index].height + claims[index].top;
+                }
+                index++;
             }
 
-            //textBox1.Text = "Done";
+            int[,] fabric = new int[maxWidth, maxHeight];
 
+            foreach (var claim in claims)
+            {
+                for (int y = claim.top; y < claim.top + claim.height; y++)
+                {
+                    for (int x = claim.left; x < claim.left + claim.width; x++)
+                    {
+                        if (fabric[x, y] != 2) fabric[x, y]++;
+                    }
+                }
+            }
+
+            int count = 0;
+
+            foreach (var i in fabric)
+            {
+                if (i == 2) count++;
+            }
+
+            textBox1.Text = count.ToString();
         }
 
         private int CountDiffs(string s1, string s2)
@@ -55,9 +77,25 @@ namespace AOC
         }
     }
 
-    class Possible
+    public class Claim
     {
-        public int x;
-        public int y;
+        public Claim(string claim)
+        {
+            var data = claim.Split(':');
+            var wh = data[1].Trim().Split('x');
+            width = Int32.Parse(wh[0].Trim());
+            height = Int32.Parse(wh[1].Trim());
+
+            var leftTop = data[0].Split('@');
+            var lt = leftTop[1].Trim().Split(',');
+            left = Int32.Parse(lt[0].Trim());
+            top = Int32.Parse(lt[1].Trim());
+            
+        }
+        public int left;
+        public int top;
+
+        public int width;
+        public int height;
     }
 }
