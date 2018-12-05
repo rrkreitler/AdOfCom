@@ -39,8 +39,6 @@ namespace AOC
                 if (textBox1.Text != "") break;
             }
 
-            //textBox1.Text = "Done";
-
         }
 
         private int CountDiffs(string s1, string s2)
